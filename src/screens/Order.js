@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import {  useDispatch, useSelector } from "react-redux";
 import OrderCategories from "../components/OrderCategories";
 import { useStyles } from "../styles"
-import { listCategories, listProducts } from "../Reducers";
+import { changeCartList, listCategories, listProducts } from "../Reducers";
 import { useNavigate } from "react-router-dom";
 import OrderProducts from "../components/OrderProducts";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
@@ -15,7 +15,6 @@ const Order = () => {
     const location = useSelector((state)=>state.location);
     const [selected, setSelected] = useState(1);
     const categoryList = useSelector((state)=>state.categoryList)
-    // const { loading, categories } = categoryList
 
     const [categoryName, setCategoryName] = useState('Beverages');
     const categoryProduct = useSelector((state)=>state.productList)
@@ -26,10 +25,8 @@ const Order = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [curProduct, setCurProduct] = useState({});
     const [curNumProduct, setCurNumProduct] = useState(0);
-    const [totalPrice, setTotalPrice] = useState(0.0);
-    const [totalItems, setTotalItems] = useState(0);
-    const [cartLists, setCartLists] = useState([]);
-    const [cartIds, setCartIds] = useState(0);
+
+    const {cartIds, totalPrice, totalItems, cartLists} = useSelector((state)=>state.carts)
 
     const closeHandler = () => {
         setIsOpen(false);
@@ -43,24 +40,31 @@ const Order = () => {
         if(e===1) setCurNumProduct(curNumProduct+1);
         else if (curNumProduct !== 0 && e===-1) setCurNumProduct(curNumProduct-1);
     }
-    const addOrders = () => {
+    const addOrders = (dispatch) => {
         if (curNumProduct!==0) {
             setCurNumProduct(0);
-            setTotalPrice(totalPrice + (curProduct.price * curNumProduct));
-            setTotalItems(totalItems + curNumProduct);
-            setCartLists([...cartLists, {"id": cartIds,"name":curProduct.name, "items":curNumProduct, "price":(curProduct.price * curNumProduct).toFixed(1)}])
-            setCartIds(cartIds + 1);
+            changeCartList(
+                dispatch, 
+                cartIds + 1,
+                totalPrice + (curProduct.price * curNumProduct), 
+                totalItems + curNumProduct, 
+                [...cartLists, {"id": cartIds+1,"name":curProduct.name, "items":curNumProduct, "price":(curProduct.price * curNumProduct).toFixed(1)}]
+            )
             closeHandler();
         }
     }
     const controlCartLists = () => {
         setCollapseOpen(!collapseOpen);
     }
-    const controlTotalCartLists = (e) => {
-        console.log(e)         
-        setCartLists(cartLists.filter(item => item.id !== e.id))
-        setTotalPrice(totalPrice - e.price)
-        setTotalItems(totalItems - e.items)
+    const controlTotalCartLists = (dispatch, e) => {
+        console.log(e)        
+        changeCartList(
+            dispatch, 
+            cartIds + 1,
+            totalPrice - e.price, 
+            totalItems - e.items, 
+            cartLists.filter(item => item.id !== e.id)
+        )
         console.log('cartLists', cartLists)
     }
 
@@ -78,12 +82,9 @@ const Order = () => {
     }, [dispatch])
 
     useEffect(()=>{
-        // reqProducts(dispatch);
         listProducts(dispatch, categoryName)
     }, [categoryName])
     
-    // console.log('productList: ',categoryProduct, productLoading, products)
-
     const styles = useStyles();
     function onClickSelected(e) {
         setSelected(e.id);
@@ -110,7 +111,7 @@ const Order = () => {
                 {cartLists.map((item, index)=>(
                     <span>
                         name: {item.name} | price: {item.price} | num: {item.items} | 
-                        <DeleteForeverIcon onClick={()=>controlTotalCartLists(item)}
+                        <DeleteForeverIcon onClick={()=>controlTotalCartLists(dispatch, item)}
                             style={{cursor:"pointer"}}
                         />
                         <br/>                        
@@ -148,7 +149,7 @@ const Order = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={()=>addOrders()}>Add to Cart</Button>
+                    <Button onClick={()=>addOrders(dispatch)}>Add to Cart</Button>
                     <Button onClick={()=>closeHandler()}>Cancel</Button>
                 </DialogActions>
 

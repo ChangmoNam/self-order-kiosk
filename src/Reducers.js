@@ -6,6 +6,7 @@ const SET_CATEGORIES_FAIL = 'SET_CATEGORIES_FAIL';
 const REQ_PRODUCTS_SUCCESS = 'REQ_PRODUCTS_SUCCESS';
 const SET_PRODUCTS_SUCCESS = 'SET_PRODUCTS_SUCCESS';
 const SET_PRODUCTS_FAIL = 'SET_PRODUCTS_FAIL';
+const UPDATE_CART_LIST = 'UPDATE_CART_LIST';
 
 const initialState = {
     location: 'EAT IN',
@@ -14,8 +15,24 @@ const initialState = {
     },
     productList: {
         productLoading: true,
+    },
+    carts: {
+        cartIds: 0,
+        cartLists: [],
+        totalPrice: 0.0,
+        totalItems: 0,
     }
 }
+
+export const changeCartList = (dispatch, cartIds, totalPrice, totalItems, cartList) => {
+    return dispatch({type: UPDATE_CART_LIST, payload: {
+        cartIds: cartIds,
+        totalPrice: totalPrice,
+        totalItems: totalItems,
+        cartLists: cartList
+        }
+    })
+}   
 
 export const selectCurLocation = (dispatch, curLocation) => {
     if(curLocation==='EAT IN') return dispatch({type: SET_ORDER_TYPE, payload: 'EAT IN'});
@@ -39,16 +56,7 @@ export const listCategories = async (dispatch) => {
     }
 }
 
-// export const reqProducts = (dispatch) => {
-//     return dispatch({
-//         type: REQ_PRODUCTS_SUCCESS,
-//     })
-// }
-
 export const listProducts = async (dispatch, categoryName='') => {
-    // dispatch({
-    //     type: REQ_PRODUCTS_SUCCESS,
-    // })
     try {
         dispatch({
             type: REQ_PRODUCTS_SUCCESS,
@@ -86,6 +94,8 @@ export const locationReducer = (state=initialState, action) => {
             return {...state, productList: {productLoading: false, products: action.payload}};
         case SET_PRODUCTS_FAIL:
             return {...state, productList: {productLoading: true, error: action.payload}};
+        case UPDATE_CART_LIST:
+            return {...state, carts: action.payload};
         default:
             return state;
     }

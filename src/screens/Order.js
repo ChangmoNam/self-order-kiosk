@@ -101,16 +101,28 @@ const Order = () => {
         }
     }
 
+    function changeCancel(dispatch) {
+        changeCartList(dispatch, 0, 0.0, 0, [])
+        navigate('/')
+    }
+    function changeDone() {
+        if(totalItems !== 0) navigate('/review')
+    }
+
     return (
         <Box>
             <Box className={[styles.space]}>
-                My Order - {location} | Total: $ {totalPrice.toFixed(1)} | Items: {totalItems} 
+                My Order - {location} | Total: $ {totalPrice.toFixed(1)} | Items: {totalItems} | &nbsp;&nbsp;
+                <span>
+                <Button onClick={()=>changeDone()} variant="contained" color="secondary" style={{width:"15%"}}>Done</Button>&nbsp;&nbsp;
+                <Button onClick={()=>changeCancel(dispatch)} variant="contained" style={{width:"15%"}}>Cancel</Button>
+                </span>
             </Box>
             {cartLists.length !==0? (<ArrowForwardIosIcon style={{cursor:"pointer"}} onClick={()=>controlCartLists()}/>):(<></>)}
             <Collapse in={collapseOpen} timeout="auto" unmounOnExit>
                 {cartLists.map((item, index)=>(
                     <span>
-                        name: {item.name} | price: {item.price} | num: {item.items} | 
+                        name: {item.name} | price: $ {item.price} | num: {item.items} | 
                         <DeleteForeverIcon onClick={()=>controlTotalCartLists(dispatch, item)}
                             style={{cursor:"pointer"}}
                         />

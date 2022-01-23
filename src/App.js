@@ -7,6 +7,7 @@ import Order from "./screens/Order";
 import { createStore } from "redux";
 import { locationReducer } from "./Reducers";
 import { Provider } from 'react-redux';
+import Review from "./screens/Review";
 
 const theme = createMuiTheme({
   typography: {
@@ -42,6 +43,7 @@ function App() {
                 <Route path="/" element={<HomeScreen/>} exact />
                 <Route path='/choose' element={<ChooseScreen/>} />
                 <Route path='/order' element={<Order/>} />
+                <Route path='/review' element={<Review/>} />
               </Routes>
         </Container>
       </BrowserRouter>

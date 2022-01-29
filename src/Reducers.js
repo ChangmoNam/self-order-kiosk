@@ -25,11 +25,12 @@ const initialState = {
 }
 
 export const changeCartList = (dispatch, cartIds, totalPrice, totalItems, cartList) => {
+
     return dispatch({type: UPDATE_CART_LIST, payload: {
         cartIds: cartIds,
         totalPrice: totalPrice,
         totalItems: totalItems,
-        cartLists: cartList
+        cartLists: cartList // id, items, name, price
         }
     })
 }   

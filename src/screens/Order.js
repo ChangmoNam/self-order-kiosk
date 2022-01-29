@@ -43,12 +43,25 @@ const Order = () => {
     const addOrders = (dispatch) => {
         if (curNumProduct!==0) {
             setCurNumProduct(0);
+            const tmpCartLists = cartLists.find((x) => x.name === curProduct.name)
+            let orderItems = tmpCartLists ?
+                cartLists.map((x) => 
+                    x.name === curProduct.name ? 
+                    {"id": x.id,"name":x.name, "items":x.items+curNumProduct, "price":(Number(x.price)+(curProduct.price * curNumProduct)).toFixed(1)}
+                    : x
+                ) : [...cartLists, {"id": cartIds+1,"name":curProduct.name, "items":curNumProduct, "price":(curProduct.price * curNumProduct).toFixed(1)}]
+            
+            
+            console.log('1: ',cartLists)
+            console.log('2: ',orderItems)
+            
+            console.log('tmpCargLists : ', tmpCartLists)
             changeCartList(
                 dispatch, 
                 cartIds + 1,
                 totalPrice + (curProduct.price * curNumProduct), 
                 totalItems + curNumProduct, 
-                [...cartLists, {"id": cartIds+1,"name":curProduct.name, "items":curNumProduct, "price":(curProduct.price * curNumProduct).toFixed(1)}]
+                orderItems
             )
             closeHandler();
         }
